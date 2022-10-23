@@ -9,7 +9,7 @@ import {
 import { FormBuilder } from '@angular/forms';
 import { Book } from '@tmo/shared/models';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 @Component({
   selector: 'tmo-book-search',
@@ -22,7 +22,7 @@ export class BookSearchComponent implements OnInit, OnDestroy {
   searchForm = this.fb.group({
     term: '',
   });
-  private ngUnsubscribe$: Subject<void>;
+  destroy$: Subject<boolean> = new Subject<boolean>();
 
 
   constructor(
@@ -32,14 +32,13 @@ export class BookSearchComponent implements OnInit, OnDestroy {
    }
 
   ngOnInit(): void {
+
     this.searchForm.get('term').valueChanges
     .pipe(
       debounceTime(500),
       distinctUntilChanged(),
-      takeUntil(this.ngUnsubscribe$)
-    )
-    .subscribe(() => this.searchBooks());
-
+      takeUntil(this.destroy$.asObservable())
+    ).subscribe(() => this.searchBooks());
   }
 
   addBookToReadingList(book: Book) {
@@ -59,7 +58,7 @@ export class BookSearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.ngUnsubscribe$.next();
-    this.ngUnsubscribe$.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
   }
 }
