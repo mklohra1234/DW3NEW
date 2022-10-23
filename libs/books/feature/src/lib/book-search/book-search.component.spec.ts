@@ -50,16 +50,14 @@ describe('Book Search Component', () => {
     it('should not dispatch searchBooks action when search field is not changed after 500 ms debounce', fakeAsync(() => {
       component.searchForm.setValue({ term: 'java' });
       tick(500);
-      expect(store.dispatch).toHaveBeenNthCalledWith(
-        1,
+      expect(store.dispatch).toHaveBeenCalledWith(
         searchBooks({ term: 'java' })
       );
 
       component.searchForm.setValue({ term: 'javas' });
       component.searchForm.setValue({ term: 'java' });
       tick(500);
-      expect(store.dispatch).toHaveBeenNthCalledWith(
-        1,
+      expect(store.dispatch).toHaveBeenCalledWith(
         searchBooks({ term: 'java' })
       );
     }));
